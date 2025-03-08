@@ -9,7 +9,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Create a cube geometry
-const geom = new THREE.BoxBufferGeometry(1, 1, 1);
+const geom = new THREE.SphereGeometry(0.5, 100, 100);
 
 // Define colors for each vertex
 const colors = [];
@@ -34,7 +34,7 @@ const cube = new THREE.Mesh(geom, mat);
 scene.add(cube);
 
 // Position the camera
-camera.position.z = 3;
+camera.position.z = 1;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
@@ -43,6 +43,7 @@ controls.screenSpacePanning = false;
 controls.minDistance = 1;
 controls.maxDistance = 10;
 controls.maxPolarAngle = Math.PI / 2;
+controls.enableZoom = false;
 
 // Function to handle window resize
 function onWindowResize() {
@@ -57,8 +58,8 @@ window.addEventListener('resize', onWindowResize, false);
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+    cube.rotation.x += 0.001;
+    cube.rotation.y += 0.001;
     renderer.render(scene, camera);
 
     controls.update();
