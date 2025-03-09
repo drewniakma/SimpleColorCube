@@ -1,27 +1,80 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js';
 import { OrbitControls } from './OrbitControls.js';
 
-// Set up the scene, camera, and renderer
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+
 
 // Usage
+
+let scene, camera, renderer, segmentedCube;
+
 // Number of segments along each axis
 const size = 5; // Overall size of the segmented cube
 const gap = 0.05; // Gap between segments
-const transparentXRows = []; // Rows to make transparent in the X dimension
-const transparentYRows = []; // Rows to make transparent in the Y dimension
-const transparentZRows = []; // Rows to make transparent in the Z dimension
+let transparentXRows = []; // Rows to make transparent in the X dimension
+let transparentYRows = []; // Rows to make transparent in the Y dimension
+let transparentZRows = []; // Rows to make transparent in the Z dimension
+let currentSegments = 5;
 
 
-let segmentedCube;
 
-// Making the updateSegmentedCube Global attached to a window
-window.updateSegmentedCube = updateSegmentedCube;
-updateSegmentedCube(5);
+function init() {
+
+// Set up the scene, camera, and renderer
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Position the camera
+camera.position.z = 7.5;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
+controls.dampingFactor = 0.25;
+controls.screenSpacePanning = false;
+controls.minDistance = 1;
+controls.maxDistance = 10;
+
+controls.enableZoom = false;
+
+updateSegmentedCube(currentSegments);
+
+
+// Function to handle window resize
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+
+window.addEventListener('resize', onWindowResize, false);
+
+// Render loop
+function animate() {
+    requestAnimationFrame(animate);
+    // cube.rotation.x += 0.001;
+    // cube.rotation.y += 0.001;
+    renderer.render(scene, camera);
+
+    controls.update();
+
+}
+
+animate();
+
+}
+
+function updateSegmentedCube(segments) {
+    if (segmentedCube) {
+        scene.remove(segmentedCube);
+    }
+    segmentedCube = createSegmentedCubeWithGapsandTransparency(segments, size, gap, transparentXRows, transparentYRows, transparentZRows);
+    scene.add(segmentedCube);
+
+}
+
 
 // Function to create a segmented cube with gaps
 function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transparentXRows, transparentYRows, transparentZRows) {
@@ -75,50 +128,17 @@ function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transpa
     return group;
 }
 
-function updateSegmentedCube(segments) {
-    if (segmentedCube) {
-        scene.remove(segmentedCube);
-    }
-    segmentedCube = createSegmentedCubeWithGapsandTransparency(segments, size, gap, transparentXRows, transparentYRows, transparentZRows);
-    scene.add(segmentedCube);
-
-}
 
 
+init();
 
-// Position the camera
-camera.position.z = 7.5;
-
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
-controls.dampingFactor = 0.25;
-controls.screenSpacePanning = false;
-controls.minDistance = 1;
-controls.maxDistance = 10;
-
-controls.enableZoom = false;
+// Event listener for segment changes
+document.getElementById('segmentsRange').addEventListener('input', function(event) {
+    currentSegments = parseInt(event.target.value);
+    updateSegmentedCube(currentSegments);
+});
 
 
-// Function to handle window resize
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
 
 
-window.addEventListener('resize', onWindowResize, false);
-
-// Render loop
-function animate() {
-    requestAnimationFrame(animate);
-    // cube.rotation.x += 0.001;
-    // cube.rotation.y += 0.001;
-    renderer.render(scene, camera);
-
-    controls.update();
-
-}
-
-animate();
 
