@@ -17,8 +17,28 @@ function createSegmentedCubeWithGaps(segments, size, gap) {
     for (let x = 0; x < segments; x++) {
         for (let y = 0; y < segments; y++) {
             for (let z = 0; z < segments; z++) {
+
                 const geom = new THREE.BoxBufferGeometry(segmentSize, segmentSize, segmentSize);
-                const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+
+
+                // Calculate a single color for the entire small cube based on its position
+                const color = new THREE.Color(
+                    x / (segments - 1),
+                    y / (segments - 1),
+                    z / (segments - 1)
+                );
+
+                // Create an array to hold the color for each vertex
+                const colors = [];
+                for (let i = 0; i < geom.attributes.position.count; i++) {
+                    colors.push(color.r, color.g, color.b);
+                }
+
+                // Add colors to the geometry
+                geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+                // Use a material that supports vertex colors
+                const material = new THREE.MeshBasicMaterial({ vertexColors: true });
                 const cube = new THREE.Mesh(geom, material);
 
                 // Calculate the position of each small cube with gaps
@@ -37,15 +57,15 @@ function createSegmentedCubeWithGaps(segments, size, gap) {
 }
 
 // Usage
-const segments = 10; // Number of segments along each axis
-const size = 3; // Overall size of the segmented cube
+const segments = 12; // Number of segments along each axis
+const size = 5; // Overall size of the segmented cube
 const gap = 0.05; // Gap between segments
 const segmentedCube = createSegmentedCubeWithGaps(segments, size, gap);
 scene.add(segmentedCube);
 
 
 // Position the camera
-camera.position.z = 5;
+camera.position.z = 6;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
