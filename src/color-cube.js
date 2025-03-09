@@ -8,9 +8,23 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// Usage
+// Number of segments along each axis
+const size = 5; // Overall size of the segmented cube
+const gap = 0.05; // Gap between segments
+const transparentXRows = []; // Rows to make transparent in the X dimension
+const transparentYRows = []; // Rows to make transparent in the Y dimension
+const transparentZRows = []; // Rows to make transparent in the Z dimension
+
+
+let segmentedCube;
+
+// Making the updateSegmentedCube Global attached to a window
+window.updateSegmentedCube = updateSegmentedCube;
+updateSegmentedCube(5);
 
 // Function to create a segmented cube with gaps
-function createSegmentedCubeWithGaps(segments, size, gap, transparentXRows, transparentYRows, transparentZRows) {
+function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transparentXRows, transparentYRows, transparentZRows) {
     const segmentSize = (size - gap * (segments - 1)) / segments;
     const group = new THREE.Group();
 
@@ -43,7 +57,7 @@ function createSegmentedCubeWithGaps(segments, size, gap, transparentXRows, tran
                     transparentZRows.includes(z);
 
                 // Use a material that supports vertex colors and transparency
-                const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: isTransparent, opacity: isTransparent ? 0 : 1.0});
+                const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: isTransparent, opacity: isTransparent ? 0.2 : 1.0});
                 const cube = new THREE.Mesh(geom, material);
 
                 // Calculate the position of each small cube with gaps
@@ -61,15 +75,15 @@ function createSegmentedCubeWithGaps(segments, size, gap, transparentXRows, tran
     return group;
 }
 
-// Usage
-const segments = 10; // Number of segments along each axis
-const size = 5; // Overall size of the segmented cube
-const gap = 0.05; // Gap between segments
-const transparentXRows = []; // Rows to make transparent in the X dimension
-const transparentYRows = []; // Rows to make transparent in the Y dimension
-const transparentZRows = []; // Rows to make transparent in the Z dimension
-const segmentedCube = createSegmentedCubeWithGaps(segments, size, gap, transparentXRows, transparentYRows, transparentZRows);
-scene.add(segmentedCube);
+function updateSegmentedCube(segments) {
+    if (segmentedCube) {
+        scene.remove(segmentedCube);
+    }
+    segmentedCube = createSegmentedCubeWithGapsandTransparency(segments, size, gap, transparentXRows, transparentYRows, transparentZRows);
+    scene.add(segmentedCube);
+
+}
+
 
 
 // Position the camera
@@ -83,6 +97,7 @@ controls.minDistance = 1;
 controls.maxDistance = 10;
 
 controls.enableZoom = false;
+
 
 // Function to handle window resize
 function onWindowResize() {
@@ -106,3 +121,4 @@ function animate() {
 }
 
 animate();
+
