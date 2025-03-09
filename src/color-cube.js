@@ -54,8 +54,8 @@ window.addEventListener('resize', onWindowResize, false);
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
-    // cube.rotation.x += 0.001;
-    // cube.rotation.y += 0.001;
+    // segmentedCube.rotation.x += 0.001;
+    // segmentedCube.rotation.y += 0.001;
     renderer.render(scene, camera);
 
     controls.update();
@@ -129,6 +129,66 @@ function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transpa
 }
 
 
+function setTransparentRows(axis, row) {
+    if (axis === 'x') {
+        transparentXRows = Array.from({ length: row }, (_, i) => i);
+    } else if (axis === 'y') {
+        transparentYRows = Array.from({ length: row }, (_, i) => i);
+    } else if (axis === 'z') {
+        transparentZRows = Array.from({ length: row }, (_, i) => i);
+    }
+    updateSegmentedCube(currentSegments);
+}
+
+// function updateSliderRanges(segmentsSettingTheRange) {
+//     const sliders = ['x-dimension', 'y-dimension', 'z-dimension'];
+//     sliders.forEach(sliderId => {
+//         const slider = document.getElementById(sliderId);
+//         slider.max = segmentsSettingTheRange;
+//         if (parseInt(sliderX.value) >= slider.max) {
+//             slider.value = slider.value - 1;
+//             setTransparentRows('x', slider.value);
+//             setTransparentRows('y', slider.value);
+//             setTransparentRows('z', slider.value);
+//             console.log(slider.value)
+         
+            
+
+//         }
+//     });
+// }
+
+
+function updateSliderRanges(segmentsSettingTheRange) {
+
+    const sliderX = document.getElementById('x-dimension');
+    const sliderY = document.getElementById('y-dimension');
+    const sliderZ = document.getElementById('z-dimension');
+    const sliderMaximum = segmentsSettingTheRange;
+
+    if (parseInt(sliderX.value) >= sliderMaximum) {
+            sliderX.value = sliderX.value - 1;
+            setTransparentRows('x', sliderX.value);
+            console.log(sliderX.value)
+    }
+
+    if (parseInt(sliderY.value) >= sliderMaximum) {
+        sliderY.value = sliderY.value - 1;
+        setTransparentRows('y', sliderY.value);
+        console.log(sliderY.value)
+    }
+
+    if (parseInt(sliderZ.value) >= sliderMaximum) {
+        sliderZ.value = sliderX.value - 1;
+        setTransparentRows('z', sliderZ.value);
+        console.log(sliderZ.value)
+    }
+
+}
+
+
+
+
 
 init();
 
@@ -136,8 +196,23 @@ init();
 document.getElementById('segmentsRange').addEventListener('input', function(event) {
     currentSegments = parseInt(event.target.value);
     updateSegmentedCube(currentSegments);
+    updateSliderRanges(currentSegments);
 });
 
+document.getElementById('x-dimension').addEventListener('input', function(event) {
+    const row = parseInt(event.target.value);
+    setTransparentRows('x', row);
+});
+
+document.getElementById('y-dimension').addEventListener('input', function(event) {
+    const row = parseInt(event.target.value);
+    setTransparentRows('y', row);
+});
+
+document.getElementById('z-dimension').addEventListener('input', function(event) {
+    const row = parseInt(event.target.value);
+    setTransparentRows('z', row);
+});
 
 
 
