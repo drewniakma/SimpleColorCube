@@ -36,7 +36,7 @@ controls.screenSpacePanning = false;
 controls.minDistance = 1;
 controls.maxDistance = 10;
 
-controls.enableZoom = false;
+// controls.enableZoom = false;
 
 updateSegmentedCube(currentSegments);
 
@@ -57,8 +57,8 @@ function animate() {
     // segmentedCube.rotation.x += 0.001;
     // segmentedCube.rotation.y += 0.001;
     renderer.render(scene, camera);
-
     controls.update();
+
 
 }
 
@@ -110,7 +110,7 @@ function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transpa
                     transparentZRows.includes(z);
 
                 // Use a material that supports vertex colors and transparency
-                const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: isTransparent, opacity: isTransparent ? 0.2 : 1.0});
+                const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: isTransparent, opacity: isTransparent ? 0.04 : 1.0});
                 const cube = new THREE.Mesh(geom, material);
 
                 // Calculate the position of each small cube with gaps
@@ -140,24 +140,6 @@ function setTransparentRows(axis, row) {
     updateSegmentedCube(currentSegments);
 }
 
-// function updateSliderRanges(segmentsSettingTheRange) {
-//     const sliders = ['x-dimension', 'y-dimension', 'z-dimension'];
-//     sliders.forEach(sliderId => {
-//         const slider = document.getElementById(sliderId);
-//         slider.max = segmentsSettingTheRange;
-//         if (parseInt(sliderX.value) >= slider.max) {
-//             slider.value = slider.value - 1;
-//             setTransparentRows('x', slider.value);
-//             setTransparentRows('y', slider.value);
-//             setTransparentRows('z', slider.value);
-//             console.log(slider.value)
-         
-            
-
-//         }
-//     });
-// }
-
 
 function updateSliderRanges(segmentsSettingTheRange) {
 
@@ -166,25 +148,92 @@ function updateSliderRanges(segmentsSettingTheRange) {
     const sliderZ = document.getElementById('z-dimension');
     const sliderMaximum = segmentsSettingTheRange;
 
+    
+
+   // Set the max attribute for each slider
+   sliderX.setAttribute('max', sliderMaximum);
+   sliderY.setAttribute('max', sliderMaximum);
+   sliderZ.setAttribute('max', sliderMaximum);
+
+   // Log the slider elements to verify the max attribute
+   console.log(sliderX, sliderY, sliderZ);
+
+
     if (parseInt(sliderX.value) >= sliderMaximum) {
-            sliderX.value = sliderX.value - 1;
-            setTransparentRows('x', sliderX.value);
-            console.log(sliderX.value)
+        
+        sliderX.value = sliderX.value - 1;
+        setTransparentRows('x', sliderX.value);
+        console.log(sliderX.value)
     }
 
     if (parseInt(sliderY.value) >= sliderMaximum) {
         sliderY.value = sliderY.value - 1;
+        
         setTransparentRows('y', sliderY.value);
+        sliderY.value = sliderMaximum;
         console.log(sliderY.value)
     }
 
     if (parseInt(sliderZ.value) >= sliderMaximum) {
-        sliderZ.value = sliderX.value - 1;
+        sliderZ.value = sliderZ.value - 1;
+        
         setTransparentRows('z', sliderZ.value);
+        sliderZ.value = sliderMaximum;
         console.log(sliderZ.value)
     }
 
 }
+
+
+
+
+// Target positions and rotations for the camera
+const targetPositions = [
+    new THREE.Vector3(0, 0, 7.5),   // View 1: Front
+    new THREE.Vector3(0, 7.5, 0.01),   // View 2: Top-right
+    new THREE.Vector3(-7.5, 0, 0)   // View 3: Left side
+];
+
+
+// Animation variables
+let isAnimating = false;
+const animationDuration = 5; // Duration in seconds
+let animationStartTime = 0;
+let currentTargetIndex = 0;
+
+// Function to animate the camera
+function animateCamera(currentTime) {
+    if (!isAnimating) return;
+
+    const elapsedTime = (currentTime - animationStartTime)  / 1000 ;
+    const t = Math.min(elapsedTime / animationDuration, 1); // Interpolation factor
+
+    // Interpolate position and rotation
+    camera.position.lerp(targetPositions[currentTargetIndex], t);
+
+    console.log(camera.rotation)    
+
+   
+    if (t < 0.1) {
+        requestAnimationFrame(animateCamera);
+    } else {
+        isAnimating = false;
+        camera.rotation.set(0, 0, 0);
+    }
+}
+
+// Function to start the camera animation
+function moveCameraToView(index) {
+    if (isAnimating) return;
+    currentTargetIndex = index;
+    isAnimating = true;
+    animationStartTime = performance.now();
+    requestAnimationFrame(animateCamera);
+}
+
+
+
+
 
 
 
@@ -215,5 +264,7 @@ document.getElementById('z-dimension').addEventListener('input', function(event)
 });
 
 
-
-
+// Add event listeners to the buttons
+document.getElementById('CameraFront').addEventListener('click', () => moveCameraToView(0));
+document.getElementById('CameraTop').addEventListener('click', () => moveCameraToView(1));
+document.getElementById('CameraSide').addEventListener('click', () => moveCameraToView(2));
