@@ -8,33 +8,44 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Create a cube geometry
-const geom = new THREE.SphereGeometry(0.5, 100, 100);
 
-// Define colors for each vertex
-const colors = [];
-const positionAttribute = geom.attributes.position;
+// Function to create a segmented cube with gaps
+function createSegmentedCubeWithGaps(segments, size, gap) {
+    const segmentSize = (size - gap * (segments - 1)) / segments;
+    const group = new THREE.Group();
 
-for (let i = 0; i < positionAttribute.count; i++) {
-    const x = positionAttribute.getX(i) + 0.5;
-    const y = positionAttribute.getY(i) + 0.5;
-    const z = positionAttribute.getZ(i) + 0.5;
-    const color = new THREE.Color(x, y, z);
-    colors.push(color.r, color.g, color.b);
+    for (let x = 0; x < segments; x++) {
+        for (let y = 0; y < segments; y++) {
+            for (let z = 0; z < segments; z++) {
+                const geom = new THREE.BoxBufferGeometry(segmentSize, segmentSize, segmentSize);
+                const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+                const cube = new THREE.Mesh(geom, material);
+
+                // Calculate the position of each small cube with gaps
+                cube.position.set(
+                    -size / 2 + segmentSize / 2 + x * (segmentSize + gap),
+                    -size / 2 + segmentSize / 2 + y * (segmentSize + gap),
+                    -size / 2 + segmentSize / 2 + z * (segmentSize + gap)
+                );
+
+                group.add(cube);
+            }
+        }
+    }
+
+    return group;
 }
 
-// Add colors to the geometry
-geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+// Usage
+const segments = 10; // Number of segments along each axis
+const size = 3; // Overall size of the segmented cube
+const gap = 0.05; // Gap between segments
+const segmentedCube = createSegmentedCubeWithGaps(segments, size, gap);
+scene.add(segmentedCube);
 
-// Create a material with vertex colors
-const mat = new THREE.MeshBasicMaterial({ vertexColors: true });
-
-// Create the cube mesh
-const cube = new THREE.Mesh(geom, mat);
-scene.add(cube);
 
 // Position the camera
-camera.position.z = 1;
+camera.position.z = 5;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
@@ -42,27 +53,28 @@ controls.dampingFactor = 0.25;
 controls.screenSpacePanning = false;
 controls.minDistance = 1;
 controls.maxDistance = 10;
-controls.maxPolarAngle = Math.PI / 2;
+
 controls.enableZoom = false;
 
-// Function to handle window resize
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
+// // Function to handle window resize
+// function onWindowResize() {
+//     camera.aspect = window.innerWidth / window.innerHeight;
+//     camera.updateProjectionMatrix();
+//     renderer.setSize(window.innerWidth, window.innerHeight);
+// }
 
 // Add event listener for window resize
-window.addEventListener('resize', onWindowResize, false);
+// window.addEventListener('resize', onWindowResize, false);
 
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
-    cube.rotation.x += 0.001;
-    cube.rotation.y += 0.001;
+    // cube.rotation.x += 0.001;
+    // cube.rotation.y += 0.001;
     renderer.render(scene, camera);
 
     controls.update();
 
 }
+
 animate();
