@@ -13,7 +13,7 @@ const gap = 0.05; // Gap between segments
 let transparentXRows = []; // Rows to make transparent in the X dimension
 let transparentYRows = []; // Rows to make transparent in the Y dimension
 let transparentZRows = []; // Rows to make transparent in the Z dimension
-let currentSegments = 5;
+let currentSegments;
 
 
 
@@ -22,24 +22,30 @@ function init() {
 // Set up the scene, camera, and renderer
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-renderer = new THREE.WebGLRenderer();
+renderer = new THREE.WebGLRenderer(); //{alpha:true} - If wanted transparency
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Position the camera
-camera.position.z = 7.5;
+// camera.position.z = 7.5;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; // An animation loop is required when either damping or auto-rotation are enabled
 controls.dampingFactor = 0.25;
-controls.screenSpacePanning = false;
-controls.minDistance = 1;
+
+controls.minDistance = 7.5;
 controls.maxDistance = 10;
 
+controls.enablePan = false;
+controls.screenSpacePanning = false;
 // controls.enableZoom = false;
 
+
+currentSegments = document.getElementById('segmentsRange').value;
 updateSegmentedCube(currentSegments);
 
+camera.position.set(4.33 ,4.33 ,4.33); // Almost exact value so the distance from the center is ~ 7,5
+camera.position.set(3, 3, 3);
 
 // Function to handle window resize
 function onWindowResize() {
@@ -68,12 +74,26 @@ animate();
 
 function updateSegmentedCube(segments) {
     if (segmentedCube) {
+        // Traverse the group and dispose of each mesh's geometry and material
+        segmentedCube.traverse((child) => {
+            if (child.isMesh) {
+                child.geometry.dispose();
+                child.material.dispose();
+            }
+        });
+
+        // Remove the group from the scene
         scene.remove(segmentedCube);
+
+        // Clear the reference
+        segmentedCube = null;
     }
+
+    // Create a new segmented cube
     segmentedCube = createSegmentedCubeWithGapsandTransparency(segments, size, gap, transparentXRows, transparentYRows, transparentZRows);
     scene.add(segmentedCube);
-
 }
+
 
 
 // Function to create a segmented cube with gaps
@@ -190,14 +210,14 @@ function updateSliderRanges(segmentsSettingTheRange) {
 // Target positions and rotations for the camera
 const targetPositions = [
     new THREE.Vector3(0, 0, 7.5),   // View 1: Front
-    new THREE.Vector3(0, 7.5, 0.01),   // View 2: Top-right
+    new THREE.Vector3(0, 7.5, 0.05),   // View 2: Top-right
     new THREE.Vector3(-7.5, 0, 0)   // View 3: Left side
 ];
 
 
 // Animation variables
 let isAnimating = false;
-const animationDuration = 5; // Duration in seconds
+const animationDuration = 1; // Duration in seconds
 let animationStartTime = 0;
 let currentTargetIndex = 0;
 
@@ -214,11 +234,11 @@ function animateCamera(currentTime) {
     console.log(camera.rotation)    
 
    
-    if (t < 0.1) {
+    if (t < 0.5) {
         requestAnimationFrame(animateCamera);
     } else {
         isAnimating = false;
-        camera.rotation.set(0, 0, 0);
+        // camera.rotation.set(0, 0, 0);
     }
 }
 
@@ -230,10 +250,6 @@ function moveCameraToView(index) {
     animationStartTime = performance.now();
     requestAnimationFrame(animateCamera);
 }
-
-
-
-
 
 
 
@@ -268,3 +284,23 @@ document.getElementById('z-dimension').addEventListener('input', function(event)
 document.getElementById('CameraFront').addEventListener('click', () => moveCameraToView(0));
 document.getElementById('CameraTop').addEventListener('click', () => moveCameraToView(1));
 document.getElementById('CameraSide').addEventListener('click', () => moveCameraToView(2));
+
+
+// THE CODE I MIGHT CHANGE IN THE FUTURE (AINT HAPPENING)
+// Add an event listener for beforeunload
+window.addEventListener('beforeunload', function (event) {
+    // Perform any cleanup or save state here
+    console.log('Page is about to reload or unload.');
+    
+});
+
+
+// Add an event listener for unload
+window.addEventListener('unload', function (event) {
+    // Perform any final cleanup here
+    console.log('Page has been unloaded.');
+    const segmentsRangeOnLoad = document.getElementById('segmentsRange');
+    const SegmentsOnLoad = parseInt(segmentsRangeOnLoad.value);
+    updateSegmentedCube(SegmentsOnLoad);
+    
+});
