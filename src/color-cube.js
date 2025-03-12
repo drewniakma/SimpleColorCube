@@ -15,16 +15,19 @@ let transparentYRows = []; // Rows to make transparent in the Y dimension
 let transparentZRows = []; // Rows to make transparent in the Z dimension
 let currentSegments;
 
+const CanvasWindow = document.getElementById('MainInteractionCanvas');
+
+
 
 
 function init() {
 
 // Set up the scene, camera, and renderer
 scene = new THREE.Scene();
-camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-renderer = new THREE.WebGLRenderer(); //{alpha:true} - If wanted transparency
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+camera = new THREE.PerspectiveCamera(75, CanvasWindow.clientWidth / CanvasWindow.clientHeight, 0.1, 1000);
+renderer = new THREE.WebGLRenderer({antialias: true }); //{alpha:true} - If wanted transparency
+renderer.setSize(CanvasWindow.clientWidth, CanvasWindow.clientHeight);
+CanvasWindow.appendChild(renderer.domElement);
 
 // Position the camera
 // camera.position.z = 7.5;
@@ -47,28 +50,129 @@ updateSegmentedCube(currentSegments);
 camera.position.set(4.33 ,4.33 ,4.33); // Almost exact value so the distance from the center is ~ 7,5
 camera.position.set(3, 3, 3);
 
-// Function to handle window resize
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+
+
+
+// THE CODE FOR COLOR PICKER
+
+
+// Set up the raycaster
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+// Used for debugging
+// Create a line geometry to visualize the ray
+// const rayLineGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+// const rayLineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 5  });
+// const rayLine = new THREE.Line(rayLineGeometry, rayLineMaterial);
+// scene.add(rayLine);
+
+
+
+// Function to update the tooltip
+function updateTooltip(color) {
+    const tooltip = document.getElementById('tooltip');
+    const colorValue = document.getElementById('color-value');
+    const colorPreview = document.getElementById('color-preview');
+
+    // Convert THREE.Color to hex string
+    const hexColor = `#${color.getHexString()}`;
+    colorValue.innerText = hexColor;
+    colorPreview.style.backgroundColor = hexColor;
+
+    // Show the tooltip
+    tooltip.style.display = 'block';
 }
 
+// Function to handle mouse move events
+function onMouseMove(event) {
 
-window.addEventListener('resize', onWindowResize, false);
+    // Get the bounding rectangle of the renderer's DOM element
+    const BoundedCanvas = renderer.domElement.getBoundingClientRect();
+
+
+    // Calculate mouse coordinates relative to the canvas element
+    const canvasX = event.clientX - BoundedCanvas.left;
+    const canvasY = event.clientY - BoundedCanvas.top;
+
+    // Normalize the coordinates to the range [-1, 1]
+    mouse.x = (canvasX / BoundedCanvas.width) * 2 - 1;
+    mouse.y = -(canvasY / BoundedCanvas.height) * 2 + 1;
+   
+   
+    raycaster.setFromCamera(mouse, camera);
+
+
+    // Calculate objects intersecting the ray
+    const intersects = raycaster.intersectObjects(segmentedCube.children, true);
+
+    if (intersects.length > 0) {
+        // Get the first intersected object
+        const intersectedCube = intersects[0].object;
+
+        // Get the color from the intersected cube
+        const color = intersectedCube.geometry.attributes.color.array;
+        const cubeColor = new THREE.Color(color[0], color[1], color[2]);
+
+        // Update the tooltip with the color
+        updateTooltip(cubeColor);
+
+        // Position the tooltip near the mouse cursor
+        const tooltip = document.getElementById('tooltip');
+        tooltip.style.left = `${event.pageX + 10}px`;
+        tooltip.style.top = `${event.pageY + 10}px`;
+    } else {
+        // Hide the tooltip if no cube is intersected
+        document.getElementById('tooltip').style.display = 'none';
+    }
+}
+
+// Add the mouse move event listener
+window.addEventListener('mousemove', onMouseMove, false);
+
+
+
+
+
+
 
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
     // segmentedCube.rotation.x += 0.001;
     // segmentedCube.rotation.y += 0.001;
+
+    // console.log(mouse.x);
+
     renderer.render(scene, camera);
     controls.update();
 
 
+    // console.log("x", mouse.x);
+    // console.log("y", mouse.y);
+    // console.log("Ray", raycaster);
+   
+
 }
 
 animate();
+
+// Function to handle window resize
+function onWindowResize() {
+
+    const newWidth = CanvasWindow.clientWidth;
+    const newHeight = CanvasWindow.clientHeight;
+
+
+    camera.aspect = CanvasWindow.clientWidth / CanvasWindow.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(newWidth, newHeight);
+}
+
+
+window.addEventListener('resize', onWindowResize, false);
+
+
 
 }
 
@@ -99,7 +203,7 @@ function updateSegmentedCube(segments) {
 // Function to create a segmented cube with gaps
 function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transparentXRows, transparentYRows, transparentZRows) {
     const segmentSize = (size - gap * (segments - 1)) / segments;
-    const group = new THREE.Group();
+    const CubeGroup = new THREE.Group();
 
     for (let x = 0; x < segments; x++) {
         for (let y = 0; y < segments; y++) {
@@ -130,7 +234,7 @@ function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transpa
                     transparentZRows.includes(z);
 
                 // Use a material that supports vertex colors and transparency
-                const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: isTransparent, opacity: isTransparent ? 0.04 : 1.0});
+                const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: isTransparent, opacity: isTransparent ? 0 : 1.0});
                 const cube = new THREE.Mesh(geom, material);
 
                 // Calculate the position of each small cube with gaps
@@ -140,12 +244,12 @@ function createSegmentedCubeWithGapsandTransparency(segments, size, gap, transpa
                     -size / 2 + segmentSize / 2 + z * (segmentSize + gap)
                 );
 
-                group.add(cube);
+                CubeGroup.add(cube);
             }
         }
     }
 
-    return group;
+    return CubeGroup;
 }
 
 
@@ -175,15 +279,15 @@ function updateSliderRanges(segmentsSettingTheRange) {
    sliderY.setAttribute('max', sliderMaximum);
    sliderZ.setAttribute('max', sliderMaximum);
 
-   // Log the slider elements to verify the max attribute
-   console.log(sliderX, sliderY, sliderZ);
+    // Log the slider elements to verify the max attribute
+    // console.log(sliderX, sliderY, sliderZ);
 
 
     if (parseInt(sliderX.value) >= sliderMaximum) {
         
         sliderX.value = sliderX.value - 1;
         setTransparentRows('x', sliderX.value);
-        console.log(sliderX.value)
+        // console.log(sliderX.value)
     }
 
     if (parseInt(sliderY.value) >= sliderMaximum) {
@@ -191,7 +295,7 @@ function updateSliderRanges(segmentsSettingTheRange) {
         
         setTransparentRows('y', sliderY.value);
         sliderY.value = sliderMaximum;
-        console.log(sliderY.value)
+        // console.log(sliderY.value)
     }
 
     if (parseInt(sliderZ.value) >= sliderMaximum) {
@@ -199,7 +303,7 @@ function updateSliderRanges(segmentsSettingTheRange) {
         
         setTransparentRows('z', sliderZ.value);
         sliderZ.value = sliderMaximum;
-        console.log(sliderZ.value)
+        // console.log(sliderZ.value)
     }
 
 }
@@ -231,7 +335,7 @@ function animateCamera(currentTime) {
     // Interpolate position and rotation
     camera.position.lerp(targetPositions[currentTargetIndex], t);
 
-    console.log(camera.rotation)    
+    // console.log(camera.rotation)    
 
    
     if (t < 0.5) {
