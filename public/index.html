@@ -5,23 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Experiment</title>
     <link rel="icon" href="./" type="image/x-icon">
-    <link rel="stylesheet" href="/src/output.css">
+    <link rel="stylesheet" href="output.css">
     <title>Document</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
-</head>
-<body class="overflow-hidden m-0">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     
-    <label for="segmentsRange">Segments: </label>
+</head>
+<body class="overflow-hidden m-0 ">
+    
+    <header class="bg-MainColor fixed w-full border-[#828282] border-b-1 z-50 shadow-md">
+        <nav class="py-2 flex items-center top-0 h-14 w-3/4 m-auto justify-between">
+          <div class="cursor-pointer h-14 py-1">
+             <img class="h-full min-w-min" src="/Images/ColorCubeBasicLogoLongDomine2.png" alt="ColorCubeTM"> 
+          </div>
+          <ul class="flex justify-end items-center gap-12 font-sans josefin-sans-regular"> 
+            <a class="cursor-pointer hover:underline  text-slate-700 hover:text-black hover:font-semibold leading-non m-0 pt-1.5  text-xl" href="otherwebsite"> About </a>
+            <button class="inline-flex justify-center whitespace-nowrap rounded-lg px-6 py-2 text-lg font-medium text-white bg-gradient-to-r from-[#1C2636] to-[#4F607A]  shadow focus:outline-none focus:ring focus:ring-slate-500/50 focus-visible:outline-none focus-visible:ring focus-visible:ring-slate-500/50 relative before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white/.5)_50%,transparent_75%,transparent_100%)] dark:before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:[transition:background-position_0s_ease] hover:before:bg-[position:-100%_0,0_0] hover:before:duration-[1500ms]" href="#0"><span class="font-bold">Tutorial</span>&nbsp;- check it out!</button>
+            
+        </ul>
+        </nav>
+    </header>
+
+
+    <div class="size-full flex items-center justify-center w-full h-dvh pt-14">
+        
+        <div class="bg-MainColor size-full flex flex-col justify-between items-center josefin-sans-regular gap-4 p-6 pr-10 max-h-dvh">
+
+                <h1 class="text-start text-5xl font-bold"> Customization:</h1>
+                <div class=" flex justify-center items-center  size-full p-4">
+                    <div class="h-full w-full">
+                        <div class="text-3xl font-bold text-center p-2">Segments: </div>
+                        <div class="border-2 border-black rounded-lg px-2"> <input class="w-full h-10 m-auto accent-black " type="range" id="segmentsRange" min="2" max="10" value="5"></div>
+                    </div>
+                </div>
+
+                <h1 class="text-start text-5xl font-bold"> Number of layers:</h1>
+                <div class=" flex justify-center items-center  size-full p-3">
+                        <div class="h-full w-4/5 ">
+                            <div class="text-3xl font-bold text-center p-2">In x dimension </div>
+                            <div class="border-2 border-[#828282] rounded-lg px-2"> <input class="w-full h-8 m-auto accent-red-600 " type="range" id="x-dimension" min="0" max="5" value="0"></div>
+                            
+                        </div>
+                </div>
+                <div class=" flex justify-center items-center  size-full p-3">
+                        <div class="h-full w-4/5">
+                            <div class="text-3xl font-bold text-center p-2">In y dimension </div>
+                            <div class="border-2 border-[#828282] rounded-lg px-2"> <input class="w-full h-8 m-auto accent-green-600 " type="range" id="y-dimension" min="0" max="5" value="0"></div>
+                        </div>
+                </div>
+                <div class=" flex justify-center items-center  size-full p-3">
+                        <div class="h-full w-4/5">
+                            <div class="text-3xl font-bold text-center p-2">In z dimension </div>
+                            <div class="border-2 border-[#828282] rounded-lg px-2"> <input class="w-full h-8 m-auto accent-blue-600 " type="range" id="z-dimension" min="0" max="5" value="0"></div>
+                        </div>
+                </div>
+
+                <div class="size-full text-5xl text-center align-middle ease-linear font-bold p-4">See how it changes -></div>
+
+
+
+        </div>
+
+
+
+        <div class="bg-MainColor w-full h-full pt-4 pb-8 px-4">
+            <div class=" size-full bg-MainColor rounded-2xl border-2 border-black relative">
+                <div class="bg-black border-2 rounded-2xl size-full absolute border-black top-4 -bottom-4 -left-3 right-4 p-2">
+                    <div class="size-full m-auto" id="MainInteractionCanvas"></div>
+                </div>
+            <!-- <div class="size-full relative block -inset-0 bg-black"><div class="bg-[#3d99ed] h-full hover:z-10  transition-all hover:translate-y-4 hover:-translate-x-4 hover:scale-100 border-2 border-black top-4 -bottom-4 -left-4 right-4 absolute"> <p class="p-4 w-full h-full"><a class="w-full h-full">Home</a></p></div></div> -->
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+    <!-- <a class="inline-flex justify-center whitespace-nowrap rounded-lg px-6 py-2 text-lg font-medium text-white bg-gradient-to-r from-[#1C2636] to-[#4F607A]  shadow focus:outline-none focus:ring focus:ring-slate-500/50 focus-visible:outline-none focus-visible:ring focus-visible:ring-slate-500/50 relative before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white/.5)_50%,transparent_75%,transparent_100%)] dark:before:bg-[linear-gradient(45deg,transparent_25%,theme(colors.white)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:[transition:background-position_0s_ease] hover:before:bg-[position:-100%_0,0_0] hover:before:duration-[1500ms]" href="#0"><span class="font-bold">Tutorial</span>&nbsp;- check it out!</a> -->
+
+
+
+
+    <!-- <label for="segmentsRange">Segments: </label>
     <input type="range" id="segmentsRange" min="2" max="10" value="5">
-    <label for="transparentXRange">Layers in x dimension </label>
+    <label class="text-3xl">Layers in x dimension </label>
     <input type="range" id="x-dimension" min="0" max="5" value="0">
-    <label for="transparentYRange">Layers in y dimension </label>
+    <label class="text-3xl">Layers in y dimension </label>
     <input type="range" id="y-dimension" min="0" max="5" value="0">
-    <label for="transparentZRange">Layers in z dimension </label>
-    <input type="range" id="z-dimension" min="0" max="5" value="0">
+    <label class="text-3xl">Layers in z dimension </label>
+    <input type="range" id="z-dimension" min="0" max="5" value="0"> -->
 
 
     
@@ -34,12 +110,12 @@
     <button id="CameraSide">Side</button>
 
 
-    <div id="tooltip" style="display: none; position: absolute; pointer-events: none; background: #333; color: #fff; padding: 5px; border-radius: 3px; font-size: 12px;">
-        HexColor: <span id="color-value"></span>
-        <div id="color-preview" style="width: 100%; height: 2px; margin-top: 5px;"></div>
+    <div id="tooltip" class="text-xl  p-4 rounded-lg" style="display: none; position: absolute; pointer-events: none; background: #333; color: #fff;">
+        HexColor : <span class="font-bold text-2xl" id="color-value"></span>
+        <div id="color-preview" class="rounded-lg" style="width: 100%; height: 8px; margin-top: 8px;"></div>
     </div>
     
-    <div  style="border:5px solid #000000; width: 100px; height: 100px;" id="MainInteractionCanvas"></div>
+    <!-- <div style="border:5px solid #000000; width: 100px; height: 100px;" id="MainInteractionCanvas"></div> -->
 
 
     <script type="module" src="/src/color-cube.js"></script>

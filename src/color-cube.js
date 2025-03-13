@@ -25,7 +25,7 @@ function init() {
 // Set up the scene, camera, and renderer
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera(75, CanvasWindow.clientWidth / CanvasWindow.clientHeight, 0.1, 1000);
-renderer = new THREE.WebGLRenderer({antialias: true }); //{alpha:true} - If wanted transparency
+renderer = new THREE.WebGLRenderer({antialias: true, alpha:true}); //{alpha:true} - If wanted transparency
 renderer.setSize(CanvasWindow.clientWidth, CanvasWindow.clientHeight);
 CanvasWindow.appendChild(renderer.domElement);
 
