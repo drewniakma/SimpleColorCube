@@ -4,6 +4,42 @@
 
 
 
+.range-slider{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  border-radius: 6px;
+  vertical-align: middle;
+ 
+  cursor: pointer;
+  
+  
+}
+
+.range-slider::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 6px;
+  border-color: white;
+  border-width: 2px;
+  position:relative;
+  width: 10px;
+  height: 30px;
+  background-color: black;
+}
+.range-slider::-moz-range-thumb{
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 6px;
+  border-color: white;
+  border-width: 2px;
+  position:relative;
+  width: 10px;
+  height: 30px;
+  background-color: black;
+}
+
+
 
 /* // <weight>: Use a value from 100 to 700
 // <uniquifier>: Use a unique and descriptive class name */

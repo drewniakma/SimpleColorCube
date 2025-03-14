@@ -361,26 +361,37 @@ function moveCameraToView(index) {
 
 init();
 
+
+const NumberOfSegments = document.getElementById('NumberOfSegmentsHTML');
+const NumberOfLayersX = document.getElementById('NumberOfLayersXHTML');
+const NumberOfLayersY = document.getElementById('NumberOfLayersYHTML');
+const NumberOfLayersZ = document.getElementById('NumberOfLayersZHTML');
+
+
 // Event listener for segment changes
 document.getElementById('segmentsRange').addEventListener('input', function(event) {
     currentSegments = parseInt(event.target.value);
     updateSegmentedCube(currentSegments);
     updateSliderRanges(currentSegments);
+    NumberOfSegments.textContent = `${currentSegments}`;
 });
 
 document.getElementById('x-dimension').addEventListener('input', function(event) {
     const row = parseInt(event.target.value);
     setTransparentRows('x', row);
+    NumberOfLayersX.textContent = `${row}`;
 });
 
 document.getElementById('y-dimension').addEventListener('input', function(event) {
     const row = parseInt(event.target.value);
     setTransparentRows('y', row);
+    NumberOfLayersY.textContent = `${row}`;
 });
 
 document.getElementById('z-dimension').addEventListener('input', function(event) {
     const row = parseInt(event.target.value);
     setTransparentRows('z', row);
+    NumberOfLayersZ.textContent = `${row}`;
 });
 
 
